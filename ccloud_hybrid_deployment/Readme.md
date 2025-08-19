@@ -76,7 +76,7 @@ kubectl get pods
 ### Check endpoint
 ```
 # Control center
-kubectl port-forward controlcenter-0 9021:9021
+kubectl port-forward controlcenter-0 9021:9021 -n confluent
 ```
 ```
 #Log into confluent center with usename admin and password Developer1
