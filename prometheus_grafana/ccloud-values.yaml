@@ -1,0 +1,50 @@
+prometheus:
+  prometheusSpec:
+    scrapeConfigs:
+      - job_name: ConfluentCloud
+        scrape_interval: 1m
+        scrape_timeout: 1m
+        honor_timestamps: true
+        scheme: https
+        metrics_path: /v2/metrics/cloud/export
+        static_configs:
+          - targets:
+              - api.telemetry.confluent.cloud
+        basic_auth:
+          username: 4GQ4XMAXETDQTIGB
+          password: cfltvl+ndedAW4bJ0p1F9hwne8pUyQ5MJsXCQqg89r+O0g+w7nE6tw2F2v5dwUNg
+        params:
+          resource.kafka.id:
+            - lkc-jmm3ow
+          resource.schema_registry.id:
+            - lsrc-1o9oj5
+
+      - job_name: ConfluentCostExporter
+        scrape_interval: 5m
+        scrape_timeout: 30s
+        honor_labels: true
+        metrics_path: /probe
+        static_configs:
+          - targets:
+              - confluent-cost-exporter.monitoring.svc.cluster.local:7979"
+---
+grafana:
+  enabled: true
+  adminUser: admin
+  adminPassword: prometheus
+  persistence:
+    enabled: true
+    size: 10Gi
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          access: proxy
+          url: http://prometheus-operated:9090
+          isDefault: true

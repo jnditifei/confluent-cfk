@@ -1,0 +1,47 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: confluent-cost-exporter
+  labels:
+    app: confluent-cost-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: confluent-cost-exporter
+  template:
+    metadata:
+      labels:
+        app: confluent-cost-exporter
+    spec:
+      containers:
+        - name: cost-exporter
+          image: docker.io/mcolomerc/confluent-costs-exporter:latest
+          ports:
+            - containerPort: 7979
+          env:
+            - name: CONFLUENT_CLOUD_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ccloud-api-secret
+                  key: api-key
+            - name: CONFLUENT_CLOUD_API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: ccloud-api-secret
+                  key: api-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: confluent-cost-exporter
+  labels:
+    app: confluent-cost-exporter
+spec:
+  selector:
+    app: confluent-cost-exporter
+  ports:
+    - protocol: TCP
+      port: 7979
+      targetPort: 7979

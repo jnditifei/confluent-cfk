@@ -1,0 +1,11 @@
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage = digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = *.confluent
+DNS.2 = *.confluent.svc
+DNS.3 = *.confluent.svc.cluster.local
+DNS.4 = *.kafka.confluent.svc.cluster.local

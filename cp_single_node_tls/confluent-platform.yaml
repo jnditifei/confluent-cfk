@@ -1,0 +1,114 @@
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: Zookeeper
+metadata:
+  name: zookeeper
+  namespace: confluent
+spec:
+  replicas: 1
+  image:
+    application: confluentinc/cp-zookeeper:7.9.0
+    init: confluentinc/confluent-init-container:2.11.0
+  dataVolumeCapacity: 10Gi
+  logVolumeCapacity: 10Gi
+  podTemplate:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+    podSecurityContext:
+      fsGroup: 1000
+      runAsUser: 1000
+      runAsNonRoot: true
+  tls:
+    secretRef: kafka-tls
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: Kafka
+metadata:
+  name: kafka
+  namespace: confluent
+spec:
+  replicas: 1
+  image:
+    application: confluentinc/cp-server:7.9.0
+    init: confluentinc/confluent-init-container:2.11.0
+  dataVolumeCapacity: 10Gi
+  podTemplate:
+    podSecurityContext:
+      fsGroup: 1000
+      runAsUser: 1000
+      runAsNonRoot: true
+  listeners:
+    external:
+      tls:
+        enabled: true
+    internal:
+      tls:
+        enabled: true
+  tls:
+    secretRef: kafka-tls
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: Connect
+metadata:
+  name: connect
+  namespace: confluent
+spec:
+  replicas: 1
+  image:
+    application: confluentinc/cp-server-connect:7.9.0
+    init: confluentinc/confluent-init-container:2.11.0
+  podTemplate:
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "500m"
+      limits:
+        memory: "1Gi"
+        cpu: "1000m"
+  dependencies:
+    kafka:
+      bootstrapEndpoint: kafka.confluent.svc.cluster.local:9092
+      tls:
+        enabled: true
+        secretRef: kafka-tls
+  configOverrides:
+    server:
+      - offset.storage.replication.factor=1
+      - config.storage.replication.factor=1
+      - status.storage.replication.factor=1
+      - producer.max.request.size=5242880
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: ControlCenter
+metadata:
+  name: controlcenter
+  namespace: confluent
+spec:
+  replicas: 1
+  image:
+    application: confluentinc/cp-enterprise-control-center:7.9.0
+    init: confluentinc/confluent-init-container:2.11.0
+  dataVolumeCapacity: 10Gi
+  podTemplate:
+    podSecurityContext:
+      fsGroup: 1000
+      runAsUser: 1000
+      runAsNonRoot: true
+  dependencies:
+    connect:
+      - name: connect-dev
+        url: http://connect.confluent.svc.cluster.local:8083
+    kafka:
+      bootstrapEndpoint: kafka.confluent.svc.cluster.local:9092
+      tls:
+        enabled: true
+        secretRef: kafka-tls
+  configOverrides:
+    server:
+      - confluent.controlcenter.internal.topics.replication=1
+      - confluent.monitoring.interceptor.topic.replication=1
+      - confluent.metrics.topic.replication=1
+      - confluent.command.topic.replication=1
+      - confluent.controlcenter.command.topic.replication=1
