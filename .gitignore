@@ -1,8 +1,7 @@
 /.idea/
-/ca-key.pem
-/ca.pem
-/custom-ca.pem
-/custom-ca.srl
-/isrgrootx1.pem
-/server.csr
-/server.pem
+*.pem
+*.jks
+*csr
+*.crt
+*.key
+*.srl
