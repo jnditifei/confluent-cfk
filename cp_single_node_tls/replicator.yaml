@@ -1,0 +1,26 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: Connector
+metadata:
+  name: replicator
+  namespace: confluent
+spec:
+  name: replicator
+  class: "io.confluent.connect.replicator.ReplicatorSourceConnector"
+  taskMax: 1
+  configs:
+    topic.whitelist: "pageviews"
+    topic.rename.format: "${topic}"
+    key.converter: "org.apache.kafka.connect.storage.StringConverter"
+    value.converter: "org.apache.kafka.connect.json.JsonConverter"
+    
+    dest.kafka.bootstrap.servers: "pkc-z1o60.europe-west1.gcp.confluent.cloud:9092"
+    dest.kafka.sasl.jaas.config: "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"key\" password=\"secret\";"
+    dest.kafka.sasl.mechanism: "PLAIN"
+    dest.kafka.security.protocol: "SASL_SSL"
+
+    src.kafka.bootstrap.servers: "kafka.confluent.svc.cluster.local:9092"
+    src.kafka.security.protocol: "SASL_SSL"
+    src.kafka.sasl.mechanism: "PLAIN"
+    src.kafka.sasl.jaas.config: "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"admin\" password=\"password\";"
+    src.kafka.ssl.truststore.location: "/mnt/sslcerts/kafka-tls/truststore.jks"
+    src.kafka.ssl.truststore.password: "${file:/mnt/sslcerts/kafka-tls/jksPassword.txt:jksPassword}"

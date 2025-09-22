@@ -43,10 +43,10 @@ spec:
       authentication:
         type: plain
         jaasConfigPassThrough:
-          secretRef: plain
+          secretRef: plain-jaas
     internal:
       authentication:
-        type: plain-jaas
+        type: plain
         jaasConfigPassThrough:
           secretRef: plain-jaas
 ---

@@ -41,6 +41,10 @@ spec:
       runAsNonRoot: true
   listeners:
     external:
+      authentication:
+        type: plain
+        jaasConfigPassThrough:
+          secretRef: plain-jaas
       tls:
         enabled: true
     internal:
@@ -56,6 +60,18 @@ metadata:
   namespace: confluent
 spec:
   replicas: 1
+  build:
+    type: onDemand
+    onDemand:
+      plugins:
+        locationType: confluentHub
+        confluentHub:
+          - name: kafka-connect-datagen
+            owner: confluentinc
+            version: 0.6.7
+          - name: kafka-connect-replicator
+            owner: confluentinc
+            version: 8.0.0
   image:
     application: confluentinc/cp-server-connect:7.9.0
     init: confluentinc/confluent-init-container:2.11.0
@@ -70,6 +86,10 @@ spec:
   dependencies:
     kafka:
       bootstrapEndpoint: kafka.confluent.svc.cluster.local:9092
+      authentication:
+        type: plain
+        jaasConfig:
+          secretRef: plain
       tls:
         enabled: true
         secretRef: kafka-tls
@@ -102,6 +122,10 @@ spec:
         url: http://connect.confluent.svc.cluster.local:8083
     kafka:
       bootstrapEndpoint: kafka.confluent.svc.cluster.local:9092
+      authentication:
+        type: plain
+        jaasConfig:
+          secretRef: plain
       tls:
         enabled: true
         secretRef: kafka-tls

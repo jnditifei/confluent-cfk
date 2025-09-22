@@ -43,3 +43,11 @@ keytool -importkeystore \
   -srcstorepass "${JKS_PASS}" \
   -alias broker-tls
 ```
+
+```
+kubectl create secret generic kafka-tls \
+  --from-file=keystore.jks=server.keystore.jks \
+  --from-file=truststore.jks=server.truststore.jks \
+  --from-literal=jksPassword="${JKS_PASS}" \
+  -n confluent
+```
