@@ -58,7 +58,7 @@ metadata:
 spec:
   replicas: 1
   image:
-    application: confluentinc/cp-server-connect:7.9.0
+    application: bondak/cp_server:latest
     init: confluentinc/confluent-init-container:2.11.0
   build:
     type: onDemand
@@ -86,7 +86,7 @@ spec:
       authentication:
         type: plain
         jaasConfig:
-          secretRef: plain
+          secretRef: plain-connect
   configOverrides:
     server:
       - offset.storage.replication.factor=1
@@ -119,7 +119,7 @@ spec:
       authentication:
         type: plain
         jaasConfig:
-          secretRef: plain
+          secretRef: plain-controlcenter
   configOverrides:
     server:
       - confluent.controlcenter.internal.topics.replication=1
